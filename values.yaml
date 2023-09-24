@@ -1,0 +1,45 @@
+# Default values for simple-deployment.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+appName: frontend
+deployment:
+  containerName: server
+  image:
+    name: gcr.io/google-samples/microservices-demo/frontend
+    version: v0.2.3
+  port: 8080
+  containerMinCPU: 100m
+  containerMaxCPU: 200m
+  containerMinMemory: 64Mi
+  containerMaxMemory: 128Mi
+  heathCheckInitDelay: 10
+  heathCheckPath: "/_healthz"
+  httpHeaderName: "Cookie"
+  httpHeaderReadyValue: "shop_session-id=x-readiness-probe"
+  httpHeaderLiveValue: "shop_session-id=x-liveness-probe"
+  containersEnvVar:
+    - name: PORT
+      value: "8080"
+    - name: PRODUCT_CATALOG_SERVICE_ADDR
+      value: "productcatalogservice:3550"
+    - name: CURRENCY_SERVICE_ADDR
+      value: "currencyservice:7000"
+    - name: CART_SERVICE_ADDR
+      value: "cartservice:7070"
+    - name: RECOMMENDATION_SERVICE_ADDR
+      value: "recommendationservice:8080"
+    - name: SHIPPING_SERVICE_ADDR
+      value: "shippingservice:50051"
+    - name: CHECKOUT_SERVICE_ADDR
+      value: "checkoutservice:5050"
+    - name: AD_SERVICE_ADDR
+      value: "adservice:9555"
+
+service:
+  type: ClusterIP
+  portName: http
+  port: 80
+
+

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.appName }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.appName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.appName }}
+    spec:
+      containers:
+        - name: {{ .Values.deployment.containerName }}
+          image: "{{ .Values.deployment.image.name }}:{{ .Values.deployment.image.version }}"
+          ports:
+          - containerPort: {{ .Values.deployment.port }}
+          readinessProbe:
+            initialDelaySeconds: {{  .Values.deployment.heathCheckInitDelay }}
+            httpGet:
+              path: {{  .Values.deployment.heathCheckPath }}
+              port: {{ .Values.deployment.port }}
+              httpHeaders:
+              - name: {{ .Values.deployment.httpHeaderName }}
+                value: {{ .Values.deployment.httpHeaderReadyValue }}
+          livenessProbe:
+            initialDelaySeconds: {{  .Values.deployment.heathCheckInitDelay }}
+            httpGet:
+              path: {{  .Values.deployment.heathCheckPath }}
+              port: {{ .Values.deployment.port }}
+              httpHeaders:
+              - name: {{ .Values.deployment.httpHeaderName }}
+                value: {{ .Values.deployment.httpHeaderLiveValue }}
+          env:
+          {{- range .Values.deployment.containersEnvVar }}
+          - name: {{ .name }}
+            value:  {{ .value | quote }}
+          {{- end }}
+          resources:
+            requests:
+              cpu: {{ .Values.deployment.containerMinCPU }}
+              memory: {{ .Values.deployment.containerMinMemory }}
+            limits:
+              cpu: {{ .Values.deployment.containerMaxCPU }}
+              memory: {{ .Values.deployment.containerMaxMemory }}
+---
